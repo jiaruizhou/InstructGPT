@@ -131,6 +131,8 @@ dmypy.json
 results/
 outputs/
 
+training_log_output/
+
 .amltconfig
 .test_output
 *.hdf5

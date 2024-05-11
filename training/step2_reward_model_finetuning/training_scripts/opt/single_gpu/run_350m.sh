@@ -6,7 +6,7 @@
 OUTPUT=$1
 ZERO_STAGE=$2
 if [ "$OUTPUT" == "" ]; then
-    OUTPUT=./output
+    OUTPUT=./outputs
 fi
 if [ "$ZERO_STAGE" == "" ]; then
     ZERO_STAGE=0
