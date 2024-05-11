@@ -6,7 +6,7 @@
 OUTPUT=$1
 ZERO_STAGE=$2
 if [ "$OUTPUT" == "" ]; then
-    OUTPUT=./output
+    OUTPUT=./outputs/retrieval
 fi
 if [ "$ZERO_STAGE" == "" ]; then
     ZERO_STAGE=0
@@ -14,13 +14,15 @@ fi
 mkdir -p $OUTPUT
 
 deepspeed main.py \
-   --data_path Dahoas/rm-static Dahoas/full-hh-rlhf Dahoas/synthetic-instruct-gptj-pairwise yitingxie/rlhf-reward-datasets \
    --data_split 2,4,4 \
+   --enable_tensorboard --tensorboard_path $OUTPUT\
    --model_name_or_path facebook/opt-350m \
    --num_padding_at_beginning 1 \
-   --per_device_train_batch_size 4 \
-   --per_device_eval_batch_size 4 \
+   --per_device_train_batch_size 8 \
+   --per_device_eval_batch_size 8 \
    --max_seq_len 512 \
+   --data_path /aiarena/gpfs/data/MSMARCO \
+   --cache_path ./tmp/marco_data \
    --learning_rate 5e-5 \
    --weight_decay 0.1 \
    --num_train_epochs 1 \

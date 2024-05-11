@@ -137,3 +137,5 @@ training_log_output/
 .test_output
 *.hdf5
 *.h5
+
+tmp

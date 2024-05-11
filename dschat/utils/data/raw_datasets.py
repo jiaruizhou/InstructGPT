@@ -48,6 +48,41 @@ class PromptRawDataset(object):
 
 
 # English dataset
+class mmarcoDataset(PromptRawDataset):
+
+    def __init__(self, output_path, seed, local_rank, dataset_name):
+        super().__init__(output_path, seed, local_rank, dataset_name)
+        self.dataset_name = "unicamp-dl/mmarco"
+        self.dataset_name_clean = "unicamp-dl/mmarco"
+
+    def get_train_data(self):
+        return self.raw_datasets["train"]
+
+    def get_eval_data(self):
+        return self.raw_datasets["test"]
+
+    def get_query(self, sample):
+        return sample[1]
+    
+    def get_passage(self, sample):
+        return sample[0]
+    # def get_prompt(self, sample):
+    #     return sample['prompt']
+
+    # def get_chosen(self, sample):
+    #     return sample['chosen']
+
+    # def get_rejected(self, sample):
+    #     return sample['rejected']
+
+    # def get_prompt_and_chosen(self, sample):
+    #     return sample['prompt'] + sample['chosen']
+
+    # def get_prompt_and_rejected(self, sample):
+    #     return sample['prompt'] + sample['rejected']
+
+
+# English dataset
 class DahoasRmstaticDataset(PromptRawDataset):
 
     def __init__(self, output_path, seed, local_rank, dataset_name):

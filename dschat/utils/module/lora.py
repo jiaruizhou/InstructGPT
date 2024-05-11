@@ -9,7 +9,6 @@ import torch.nn.functional as F
 from deepspeed.compression.helper import recursive_getattr, recursive_setattr
 import deepspeed
 
-
 class LinearLayer_LoRA(nn.Module):
     # an simple implementation of LoRA
     # for now only support Linear Layer

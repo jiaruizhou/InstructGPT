@@ -111,7 +111,7 @@ def create_hf_model(model_class,
     model.resize_token_embeddings(int(
         8 *
         math.ceil(len(tokenizer) / 8.0)))  # make the vocab size multiple of 8
-
+    # why? 
     return model
 
 
@@ -121,6 +121,7 @@ def create_critic_model(model_name_or_path,
                         num_padding_at_beginning=0,
                         rlhf_training=False,
                         dropout=None,
+                        out_dim=128,
                         zero_stage=0,
                         compute_fp32_loss=False):
     # OPT model family always put a padding token at the beginning of the sequence,
@@ -138,6 +139,7 @@ def create_critic_model(model_name_or_path,
     critic_model = RewardModel(
         critic_model,
         tokenizer,
+        out_dim,
         num_padding_at_beginning=num_padding_at_beginning,
         compute_fp32_loss=compute_fp32_loss)
 
@@ -156,7 +158,7 @@ def create_critic_model(model_name_or_path,
         end = time.time()
         print_rank_0(f">Creating model from_config took {end - start} seconds",
                      None)
-
+        
         # load critic model from checkpoint with zero-stage 3 compatibility
         # this functionality may be moved to DS checkpoint load API in future
         start = time.time()
@@ -170,3 +172,35 @@ def create_critic_model(model_name_or_path,
                      None)
 
     return critic_model
+
+
+class InfoNCE(torch.nn.Module):
+    def __init__(self) -> None:
+        super(InfoNCE,self).__init__()
+    def forward(self,queries,positives):
+        bs=queries.shape[0]
+        sim_matrix = torch.mm(queries, positives.t())
+        label = torch.arange(bs, device=sim_matrix.device)
+        loss = torch.nn.functional.cross_entropy(sim_matrix, label)
+        return loss
+
+
+class ContrastiveLoss(torch.nn.Module):
+
+    def __init__(self, margin=0.95):
+        super(ContrastiveLoss, self).__init__()
+        self.margin = margin
+
+    def forward(self, query,passage):
+        sim=torch.mm(query,passage.t())
+
+        label = torch.eye(query.shape[0]).float().to(query.device)
+        distances = torch.mean(torch.cdist(query.unsqueeze(0).repeat(query.shape[0], 1, 1).float(), \
+            passage.unsqueeze(1).repeat(1, passage.shape[0], 1).float(), p=2), dim=-1)
+        whole_loss = ((label) * torch.pow(distances, 2) + (1 - label) * torch.pow(torch.clamp(self.margin - distances, min=0.0), 2))
+        
+        loss_contrastive = torch.mean(whole_loss)
+        # import pdb
+        # pdb.set_trace()
+        return loss_contrastive
+

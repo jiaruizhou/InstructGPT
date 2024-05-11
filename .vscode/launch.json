@@ -1,0 +1,42 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "run_350m.sh",
+            "type": "python",
+            "request": "launch",
+            "python": "/opt/conda/bin/python3.10",
+            "program": "/aiarena/gpfs/DeepSpeed-Chat/training/step2_reward_model_finetuning/main.py",
+            "cwd": "/aiarena/gpfs/DeepSpeed-Chat/training/step2_reward_model_finetuning/",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "DISPLAY": "localhost:10.0",
+                "CUDA_VISIBLE_DEVICES": "0"
+            },
+            "args": [
+                "--model_name_or_path",
+                "facebook/opt-350m",
+                "--num_padding_at_beginning",
+                "1",
+                "--weight_decay",
+                "0.1",
+                "--dropout",
+                "0.0",
+                "--gradient_accumulation_steps",
+                "4",
+                "--zero_stage",
+                "2",
+                "--enable_tensorboard",
+                "--tensorboard_path",
+                "./outputs",
+                "--deepspeed",
+                "--output_dir",
+                "./outputs"
+            ]
+        },
+    ]
+}

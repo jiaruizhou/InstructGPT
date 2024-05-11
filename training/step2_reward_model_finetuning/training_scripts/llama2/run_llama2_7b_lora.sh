@@ -46,7 +46,7 @@
 OUTPUT=$1
 ZERO_STAGE=$2
 if [ "$OUTPUT" == "" ]; then
-    OUTPUT=./outputs/output_step2_llama_7b
+    OUTPUT=./outputs/retrieval
 fi
 if [ "$ZERO_STAGE" == "" ]; then
     ZERO_STAGE=2
@@ -54,12 +54,13 @@ fi
 mkdir -p $OUTPUT
 
 deepspeed main.py \
-   --data_path Dahoas/rm-static \
-   --data_split 0,1,0 \
-   --model_name_or_path ~/meta-llama/Llama-2-7b-hf \
-   --per_device_train_batch_size 8 \
-   --per_device_eval_batch_size 8 \
-   --max_seq_len 512 \
+   --data_path /aiarena/gpfs/data/MSMARCO --cache_path ./tmp/marco_data \
+   --model_name_or_path ~/hugging-face/meta-llama/Llama-2-7b-hf \
+   --data_output_path /tmp/marco_data_files/\
+   --per_device_train_batch_size 16 \
+   --per_device_eval_batch_size 16 \
+   --max_seq_len 256 \
+   --out_dim 128 \
    --learning_rate 9.65e-6 \
    --weight_decay 0.1 \
    --num_padding_at_beginning 0 \
